@@ -1,0 +1,2 @@
+model_checkpoint_path: "linear.checkpoint"
+all_model_checkpoint_paths: "linear.checkpoint"
