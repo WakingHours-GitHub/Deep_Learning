@@ -6,7 +6,7 @@ import tensorflow._api.v2.compat.v1 as tf
 
 tf.disable_v2_behavior()  # 禁用v2版本的行为
 
-tf.logging.set_verbosity(tf.logging.ERROR)
+# tf.logging.set_verbosity(tf.logging.ERROR)
 """
 Level	Level for Humans	        Level Description
 0	        DEBUG	            all messages are logged (Default)
@@ -76,13 +76,14 @@ def convolutional_neural_network(x):
 
     # 卷积层
     with tf.variable_scope("convolutional"):
-        # 定义fileter和bias
+        # 定义filter和bias
         weights_conv_1 = tf.Variable(
             initial_value=tf.random_normal(shape=[3, 3, 1, 32], mean=0.0, stddev=2)
         )
         bias_conv_1 = tf.Variable(
             initial_value=tf.random_normal(shape=[32], mean=0.0, stddev=2)
         )
+
         x_conv_1 = tf.nn.conv2d(
             input=x,
             filter=weights_conv_1,
@@ -122,6 +123,7 @@ def convolutional_neural_network(x):
             # print(y_pred)  # Tensor("convolutional/full_connection/Add:0", shape=(1, 40), dtype=float32, device=/device:GPU:0)
 
     return y_pred
+
 """
 def convolutional_neural_network_2(x):
     # 输入图像：[batch_size, 50, 130, 1]
@@ -242,7 +244,7 @@ def CNN(image=None, is_train=True, is_load=True):
 
         # 构造优化器
         with tf.variable_scope("optimizer"):
-            optimizer = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(loss)
+            optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
 
 
 
@@ -266,13 +268,14 @@ def CNN(image=None, is_train=True, is_load=True):
 
     # @ with tf.device("/GPU:0") 结束
 
-    # 收集变量, 便于可视化
-    #
-    tf.summary.scalar("loss", loss)
-    tf.summary.scalar("accuracy", accuracy)
 
-    # 聚合我们收集的变量
-    merged = tf.summary.merge_all()
+    with tf.variable_scope("summay"):
+        # 收集变量, 便于可视化
+        tf.summary.scalar("loss", loss)
+        tf.summary.scalar("accuracy", accuracy)
+
+        # 聚合我们收集的变量
+        merged = tf.summary.merge_all()
 
     # 初始化保存器
     saver = tf.train.Saver()
