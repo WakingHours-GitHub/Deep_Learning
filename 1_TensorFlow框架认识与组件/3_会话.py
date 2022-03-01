@@ -1,9 +1,3 @@
-"""
-
-
-
-"""
-
 import tensorflow._api.v2.compat.v1 as tf
 
 tf.disable_v2_behavior()
@@ -39,7 +33,7 @@ def session_demo():
     # 我们使用placeholder() -> 操作函数 -> 内部实例化了一个placehlder操作对象 -> 对Tensor进行处理.
     # 所以第一个参数就变成了该placeholder对象
 
-    # 开启会话: -> Session会使用一定的资源
+    # 开启会话: -> Session也是会使用一定的资源
     #  def __init__(self, target='', graph=None, config=None):
     # sess = tf.Session()
     # # 操作

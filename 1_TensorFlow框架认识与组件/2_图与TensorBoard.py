@@ -6,11 +6,14 @@ tf.disable_v2_behavior()
 操作函数                        &                  操作对象
 tf.constant(Tensor对象)            输入Tensor对象 -> 创建Const对象 -> 输出 Tensor对象
 tf.add(Tensor对象1, Tensor对象2)   输入Tensor对象1, Tensor对象2 -> 经过Add对象 -> 输出 Tensor对象3
+区分操作函数和操作对象
+
 就是: 输入Tensor对象, 然后经过操作函数, 操作函数会实例化一个操作对象, 然后计算, 得到一个Tensor对象, 然后通过函数返回值返回该对象
         所以不管输入还是输出, 都是Tensor, 里面计算的细节被屏蔽了
         而打印Tensor对象, 一共有三个参数, :
         Tensor{"", shape=(), dtype=}
         第一个参数(我们称之为 指令名称 ) 就告诉你了这个Tensor变量是通过哪个操作对象得来的 -> 这个我们称之为指令名称
+        
 注意: 打印出来的是张量值, 可以理解成OP当中包含了这个值. 并且每一个op指令, 都可以对应一个唯一的值, 就是指令名称
     命名形式: <OP_NAME>:<int>
         <OP_NAME>: 是生成该张量的指令的名称

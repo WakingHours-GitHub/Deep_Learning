@@ -1,12 +1,13 @@
-import cv2 as cv
 import os
+
+import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow._api.v2.compat.v1 as tf
 
 tf.disable_v2_behavior()  # 禁用v2版本的行为
 
-# tf.logging.set_verbosity(tf.logging.ERROR)
+tf.logging.set_verbosity(tf.logging.ERROR)  # 忽略tf报错的等级
 """
 Level	Level for Humans	        Level Description
 0	        DEBUG	            all messages are logged (Default)
@@ -15,9 +16,11 @@ Level	Level for Humans	        Level Description
 3	        ERROR	            INFO, WARNING, and ERROR messages are not printed
 """
 
-# 训练时候的
-batch_size = 100
+tf.reset_default_graph() # 重置初始图
+graph = tf.Graph() # 属性
 
+# 训练时候的, batch_size (批处理队列长度)
+batch_size = 100
 
 # image information:
 height = 50
@@ -32,7 +35,7 @@ def read_picture(batch_size=100):
     返回读取好的批处理
     """
     # 构建文件名序列:
-    path = "..\\checkout_gray"
+    path = "..\\checkout_gray"  # 识别代码需要保存的文件路径
     file_list = [os.path.join(path, filename) for filename in os.listdir(path)]
     # print(file_list)
     # 生成文件队列:
@@ -124,6 +127,7 @@ def convolutional_neural_network(x):
 
     return y_pred
 
+
 """
 def convolutional_neural_network_2(x):
     # 输入图像：[batch_size, 50, 130, 1]
@@ -189,6 +193,7 @@ def convolutional_neural_network_2(x):
     return y_pred
 """
 
+
 def break_labels(filename_batch):
     break_labels_list = []
     for filename in filename_batch:
@@ -219,13 +224,12 @@ def key2filename(key_batch_value):
 
 
 def CNN(image=None, is_train=True, is_load=True):
-
     # 读入图片数据:
     key_batch, image_batch = read_picture()
 
     # 准备模型
-    with tf.device("/GPU:0"):
-        with tf.variable_scope(""):
+    with tf.device("/GPU:0"):  # use GPU:0
+        with tf.variable_scope("model_prepare"):
             x = tf.placeholder(shape=[None, height, width, channel], dtype=tf.float32)
             y_true = tf.placeholder(shape=[None, 4 * 10], dtype=tf.float32)
 
@@ -246,8 +250,6 @@ def CNN(image=None, is_train=True, is_load=True):
         with tf.variable_scope("optimizer"):
             optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
 
-
-
         # 计算准确率:
         # equal = tf.equal(
         #     tf.argmax(tf.reshape(y_true, shape=[batch_size, 4, 10]), axis=2),
@@ -260,22 +262,22 @@ def CNN(image=None, is_train=True, is_load=True):
                 tf.argmax(tf.reshape(y_pred, shape=[-1, 4, 10]), axis=2)
             ),
             axis=1
-        ) # all
+        )  # all
         accuracy = tf.reduce_mean(tf.cast(equal_list, dtype=tf.float32))
 
         # 显示开启初始化变量
-        init = tf.global_variables_initializer()
+        with tf.variable_scope("variables_initializer"):
+            init = tf.global_variables_initializer()
 
     # @ with tf.device("/GPU:0") 结束
 
-
     with tf.variable_scope("summay"):
         # 收集变量, 便于可视化
-        tf.summary.scalar("loss", loss)
+        tf.summary.scalar("loss", loss)  # 标量
         tf.summary.scalar("accuracy", accuracy)
 
         # 聚合我们收集的变量
-        merged = tf.summary.merge_all()
+        merged = tf.summary.merge_all()  # merged operation
 
     # 初始化保存器
     saver = tf.train.Saver()
@@ -284,20 +286,19 @@ def CNN(image=None, is_train=True, is_load=True):
     with tf.device("/GPU:0"):
         # 开启会话:
         with tf.Session() as sess:
-            sess.run(init)
-
+            sess.run(init)  # 初始化变量
+            # 线程协调员
             coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+            threads = tf.train.start_queue_runners(sess=sess, coord=coord)  # 开启队列
 
             # 创建事件文件, 用于在TensorBoard中进行可视化
             file_event = tf.summary.FileWriter("./event/model", graph=sess.graph)
 
-
             # 是否训练:
             if is_train:
 
-                if is_load:
-                    print("load model")
+                if is_load:  # 是否加载以前保存的模型
+                    print("load model ing...")
                     if os.path.exists("checkpoint"):
                         saver.restore(sess=sess, save_path="./checkpoint/model.ckpt")
                     else:
@@ -305,36 +306,37 @@ def CNN(image=None, is_train=True, is_load=True):
 
                 ############################################################################
 
-                for i in range(100000):
+                for i in range(100000): # 开始训练
                     key_value, image_value = sess.run([key_batch, image_batch])
                     key_value = key2filename(key_value)
                     # print(key_value)  # [[0 1 5 5]]
+
                     # 进行one_hot编码:
                     labels_value = tf.reshape(tf.one_hot(key_value, depth=10), shape=[-1, 4 * 10]).eval()
                     # print(labels_value) # [[0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 1. 0. 0.
                     # 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]]
 
-
-
                     # 运行优化器:
-                    _, loss_value, accuracy_value = sess.run([optimizer, loss, accuracy], feed_dict={x: image_value, y_true:labels_value})
+                    _, loss_value, accuracy_value, summary = sess.run(
+                        [optimizer, loss, accuracy, merged],
+                        feed_dict={x: image_value, y_true: labels_value}
+                    )
                     print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f" % (loss_value, accuracy_value))
 
                     #
-                    summary = sess.run(merged, feed_dict={x:image_value, y_true:labels_value})
-                    file_event.add_summary(summary, i)
-                    if not(i % 100):
+                    # summary = sess.run(merged, feed_dict={x: image_value, y_true: labels_value})
+                    file_event.add_summary(summary, i)  # 将本次运行的summary添加早event中
+                    if not (i % 100):  # 每100次保存一下代码
                         saver.save(
                             sess=sess,
                             save_path="./checkpoint/model.ckpt"
                         )
+                        #
 
 
 
-
-
-
-            else: # 预测数据
+            else:  # 预测数据
+                print("use CNN model to predict:")
                 print("load model...")
                 if os.path.exists("checkpoint"):
                     saver.restore(sess=sess, save_path="./checkpoint/model.ckpt")
@@ -344,7 +346,6 @@ def CNN(image=None, is_train=True, is_load=True):
                 result = tf.argmax(tf.reshape(y_pred_value, shape=[-1, 4, 10]), axis=2).eval()[0]
                 print("OCR result: ", result)
                 return str(result)
-
 
                 ################################################################################################
 
@@ -362,15 +363,16 @@ def image():
     img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     # print(img_gray.shape)
 
-
     plt.imshow(img)
     plt.show()
 
-    return np.array(np.reshape(img_gray, newshape=[1, height, width, channel]))*255
+    return np.array(np.reshape(img_gray, newshape=[1, height, width, channel])) * 255  # 重置
 
-# def predict(image):
-# (100, 50, 130, 1)
 
 if __name__ == '__main__':
-    # img = image()
-    CNN(is_train=True, is_load=False)
+    # 预测
+    img = image()
+    CNN(image(), is_train=False)
+
+    # 训练
+    # CNN(is_train=True, is_load=True)
