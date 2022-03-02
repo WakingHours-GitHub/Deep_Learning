@@ -3,6 +3,7 @@ import tensorflow._api.v2.compat.v1 as tf
 tf.disable_v2_behavior()
 
 """
+OP: 
 操作函数                        &                  操作对象
 tf.constant(Tensor对象)            输入Tensor对象 -> 创建Const对象 -> 输出 Tensor对象
 tf.add(Tensor对象1, Tensor对象2)   输入Tensor对象1, Tensor对象2 -> 经过Add对象 -> 输出 Tensor对象3
@@ -28,7 +29,7 @@ def graph_demo():
     :return:
     """
     # 还是那个例子: 加法
-    a_t = tf.constant(2) # constant n. 常数，恒量；不变的事物
+    a_t = tf.constant(2)  # constant n. 常数，恒量；不变的事物
     b_t = tf.constant(3)
     c_t = a_t + b_t  # 传统的操作
     # right operation: 是通过操作函数来实现对Tensor进行操作
@@ -55,34 +56,34 @@ def graph_demo():
 
     # 方法1: 查看默认图:
     default_graph = tf.get_default_graph()  # 获取默认图
-    print("default graph:",
-          default_graph)  # default graph: <tensorflow.python.framework.ops.Graph object at 0x00000218B79F2D90>
+    print("default graph:", default_graph)
+    # default graph: <tensorflow.python.framework.ops.Graph object at 0x00000218B79F2D90>
 
     # 方法2: 查看属性
     print("a_t的图属性:", a_t.graph)  # a_t的图属性: <tensorflow.python.framework.ops.Graph object at 0x000001DE729E6CA0>
     print("c_t的图属性:", c_t.graph)  # c_t的图属性: <tensorflow.python.framework.ops.Graph object at 0x000001DE729E6CA0>
 
-
-
     # 自定义图:
-    my_graph = tf.Graph() # 实例化一个Graph对象
+    my_graph = tf.Graph()  # 实例化一个Graph对象
     # 在自己的图中定义数据和操作
-    with my_graph.as_default():
+    with my_graph.as_default(): # 这是在我们自定义的Graph
         my_a_t = tf.constant(20)
         my_b_t = tf.constant(30)
         my_c_t = tf.add(my_a_t, my_b_t)
-        print("my_c_t", my_c_t) # my_c_t Tensor("Add:0", shape=(), dtype=int32)
+        print("my_c_t", my_c_t)  # my_c_t Tensor("Add:0", shape=(), dtype=int32)
         # 同理对于my_a_t和my_b_t也是一样
 
-        # 查看图属性
-        print("my_c_t的图属性", my_c_t.graph) # my_c_t的图属性 <tensorflow.python.framework.ops.Graph object at 0x00000216E6F07250>
+        # 在会话中查看图属性
+        print("my_c_t的图属性",
+              my_c_t.graph)  # my_c_t的图属性 <tensorflow.python.framework.ops.Graph object at 0x00000216E6F07250>
 
     # 开启Session
     with tf.Session() as sess:
-        c_t_value1 = sess.run(c_t) # 执行c_t的操作
+        c_t_value1 = sess.run(c_t)  # 执行c_t的操作
 
         # 看看sess的图属性：
-        print("sess的图属性: ", sess.graph) # sess的图属性:  <tensorflow.python.framework.ops.Graph object at 0x0000019631F28FD0>
+        print("sess的图属性: ",
+              sess.graph)  # sess的图属性:  <tensorflow.python.framework.ops.Graph object at 0x0000019631F28FD0>
 
         # 尝试执行自定义图中的数据和操作
         # c_t_value2 = sess.run(my_c_t) # 报错
@@ -105,12 +106,14 @@ def graph_demo():
         # 在浏览器中打开TensorBoard的图页面,127.0.0.1:6006
         #             然后就可以看到可视化的效果了.asdasdddddddddddddddddddddddddddd
 
-    # 开启my_graph的Session -> 需要指定名字
+    # 开启my_graph的Session -> 需要指定图名字
     with tf.Session(graph=my_graph) as my_sess:
-        my_c_t_value = my_sess.run(my_c_t) # 运行
-        print("my_c_t_value: ", my_c_t_value) # my_c_t_value: 50
+        my_c_t_value = my_sess.run(my_c_t)  # 运行
+        print("my_c_t_value: ", my_c_t_value)  # my_c_t_value: 50
+        # 注意, 必须开启包含该操作的图, 否则会报错
         # 查看图属性:
-        print("my_sess的图属性: ", my_sess.graph) # my_sess的图属性:  <tensorflow.python.framework.ops.Graph object at 0x000001425A6CCE50>
+        print("my_sess的图属性: ",
+              my_sess.graph)  # my_sess的图属性:  <tensorflow.python.framework.ops.Graph object at 0x000001425A6CCE50>
 
     return None
 
