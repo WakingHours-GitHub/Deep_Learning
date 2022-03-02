@@ -92,7 +92,7 @@ def graph_demo():
         #   def __init__(self, target='', graph=None, config=None):
 
         # 我们还可以将图写入本地生成event文件
-        tf.summary.FileWriter("./event/tmp", graph=sess.graph)
+        tf.summary.FileWriter("./event/tmp", graph=sess.graph) # 将图序列化到本地
         #   def __init__(self,
         #                logdir, # 保存的路径
         #                graph=None, # 指定的图
