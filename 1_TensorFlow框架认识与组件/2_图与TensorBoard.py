@@ -104,7 +104,7 @@ def graph_demo():
         # 然后在cmd中使用:
         # tensorboard --logdir="path"
         # 在浏览器中打开TensorBoard的图页面,127.0.0.1:6006
-        #             然后就可以看到可视化的效果了.asdasdddddddddddddddddddddddddddd
+        #             然后就可以看到可视化的效果了.
 
     # 开启my_graph的Session -> 需要指定图名字
     with tf.Session(graph=my_graph) as my_sess:

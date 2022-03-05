@@ -372,7 +372,7 @@ def image():
 if __name__ == '__main__':
     # 预测
     img = image()
-    CNN(image(), is_train=False)
+    # CNN(image(), is_train=False)
 
     # 训练
-    # CNN(is_train=True, is_load=True)
+    CNN(is_train=True, is_load=True)

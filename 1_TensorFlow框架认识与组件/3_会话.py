@@ -42,8 +42,8 @@ def session_demo():
     with tf.Session(
             # target='', # 当tf部署在多个机器上的时候, 可以指定目标地址
             graph=None,  # 指定运行的图为什么, None就是默认图
-            config=tf.ConfigProto(  # 输出日志
-                allow_soft_placement=True,
+            config=tf.ConfigProto(  # 输出日志, 会话可以指定不同设备运行
+                allow_soft_placement=True, #
                 log_device_placement=True
             )
     ) as sess:

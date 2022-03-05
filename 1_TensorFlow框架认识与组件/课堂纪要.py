@@ -180,11 +180,11 @@ IO数据读取、神经网络基础 1天
     一个运行TensorFlow operation的类, 会话中包含了以下两种开启方式.
         tf.Session：用于完整的程序当中
         tf.InteractiveSession：用于交互式上下文中的TensorFlow ，例如shell
-            可以用.evel()来查看变量的值, 这种方式只能用在Session中
+            可以用.evel()来查看变量的值, 这种方式只能用在Session中.(例如c_t.eval())
         1. TensorFlow使用tf.Session类来表示客户端程序(通常为python程序, 但是也提供了使用其他语言的类似接口),与c++运行之间的链接
         2. tf.Session对象使用分布式TensorFlow运行时提供对本地计算机中的设备和远程设备的访问权限.
 
-        1）会话是掌握一定资源的, 用完要回收(例如文件) -> 上下文管理器(with...)
+        1）会话是掌握一定资源的, 用完要回收(例如文件) -> 所以使用上下文管理器(with...)
         2）初始化会话对象时的参数如下:
             graph=None # 运行哪一张图, None -> 就是运行默认图
             target：如果将此参数留空（默认设置）, 会话将仅使用本地计算机中的设备。
@@ -200,6 +200,8 @@ IO数据读取、神经网络基础 1天
                     与tf.placeholder搭配使用, 则会检查值的形状是否与占位符兼容
 
         3 feed操作 -> placeholder提供占位符, run的时候通过feed_dict指定参数
+            placeholder是指, 在定义张量的时候我们不知道具体的值是什么, 于是我们使用placeholder占位(仅仅指定类型)
+            在运行的时候, 我们再给其赋值.
             例子:
                 # 定位占位符.
                 a = tf.placeholder(tf.float32, shape=)
