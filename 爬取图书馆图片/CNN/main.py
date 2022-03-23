@@ -1,4 +1,5 @@
 import os
+import random
 
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -16,8 +17,8 @@ Level	Level for Humans	        Level Description
 3	        ERROR	            INFO, WARNING, and ERROR messages are not printed
 """
 
-tf.reset_default_graph() # 重置初始图
-graph = tf.Graph() # 属性
+tf.reset_default_graph()  # 重置初始图
+graph = tf.Graph()  # 属性
 
 # 训练时候的, batch_size (批处理队列长度)
 batch_size = 100
@@ -280,7 +281,13 @@ def CNN(image=None, is_train=True, is_load=True):
         merged = tf.summary.merge_all()  # merged operation
 
     # 初始化保存器
-    saver = tf.train.Saver()
+    try:
+        saver = tf.train.Saver()
+    except :
+        tf.reset_default_graph()
+        saver = tf.train.Saver()
+
+
 
     # 使用GPU
     with tf.device("/GPU:0"):
@@ -306,7 +313,7 @@ def CNN(image=None, is_train=True, is_load=True):
 
                 ############################################################################
 
-                for i in range(100000): # 开始训练
+                for i in range(100000):  # 开始训练
                     key_value, image_value = sess.run([key_batch, image_batch])
                     key_value = key2filename(key_value)
                     # print(key_value)  # [[0 1 5 5]]
@@ -344,8 +351,11 @@ def CNN(image=None, is_train=True, is_load=True):
                     print("model path not exist")
                 y_pred_value = sess.run(y_pred, feed_dict={x: image})
                 result = tf.argmax(tf.reshape(y_pred_value, shape=[-1, 4, 10]), axis=2).eval()[0]
-                print("OCR result: ", result)
-                return str(result)
+                # print("OCR result: ", result)
+                # ''.join(str(result).strip('[]').split())
+                # ''.join([str(x) for x in result.tolist()])
+
+                return ''.join([str(x) for x in result.tolist()])  # 直接返回的是str类型
 
                 ################################################################################################
 
@@ -355,7 +365,7 @@ def CNN(image=None, is_train=True, is_load=True):
     return None
 
 
-def image():
+def get_image():
     # cv.imread("./tushuguan jiequ/resize_img.png")
     img = plt.imread("./tushuguan jiequ/resize_img.png")
     # matplotlib.image.imread()在读取图像的时候顺便归一化了。
@@ -369,10 +379,41 @@ def image():
     return np.array(np.reshape(img_gray, newshape=[1, height, width, channel])) * 255  # 重置
 
 
+def conversion_image_format(img):
+    return np.array(np.reshape(img, newshape=[1, height, width, channel]))  # 逆归一化
+
+
+def image():
+    root = "../checkout_gray"
+    img_list = os.listdir(root)
+    random_gary_list = random.sample(img_list, 6)
+    # 画图
+    fig = plt.figure(figsize=(8, 4))
+
+    for i in range(2):
+        for j in range(3):
+            img = cv.imread(root + '/' + random_gary_list[i + j])
+            # print(img)
+            img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+            img_gray = conversion_image_format(img_gray)
+            ocr_result = CNN(img_gray, is_train=False)
+            print("ocr_result: ", ocr_result)
+            fig.add_subplot(6, i + 1, j + 1)
+            plt.imshow(img[:, :, ::-1])
+            # ocr result
+            plt.title("ocr: " + ocr_result)
+        #     break
+        # break
+    plt.show()
+
+
 if __name__ == '__main__':
     # 预测
-    img = image()
-    # CNN(image(), is_train=False)
+    # img = get_image()
+    # ocr_result = CNN(get_image(), is_train=False)
+    # print(''.join(ocr_result.strip('[]').split()))
+    image()
 
     # 训练
-    CNN(is_train=True, is_load=True)
+    # CNN(is_train=True, is_load=True)
