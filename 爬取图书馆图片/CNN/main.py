@@ -3,6 +3,7 @@ import random
 
 import cv2 as cv
 import matplotlib.pyplot as plt
+import matplotlib.pylab as pll
 import numpy as np
 import tensorflow._api.v2.compat.v1 as tf
 
@@ -16,7 +17,7 @@ Level	Level for Humans	        Level Description
 2	        WARN	            INFO and WARNING messages are not printed
 3	        ERROR	            INFO, WARNING, and ERROR messages are not printed
 """
-
+#
 tf.reset_default_graph()  # 重置初始图
 graph = tf.Graph()  # 属性
 
@@ -68,7 +69,7 @@ def read_picture(batch_size=100):
     # Tensor("add:0", shape=(1,), dtype=string)
     # Tensor("batch:1", shape=(1, 50, 130, 3), dtype=float32)
 
-    return key_batch, value_batch
+    return key_batch, value_batch # 返回批处理队列
 
 
 def convolutional_neural_network(x):
@@ -225,6 +226,8 @@ def key2filename(key_batch_value):
 
 
 def CNN(image=None, is_train=True, is_load=True):
+    tf.reset_default_graph()  # 需要在网络结构之前加上重置图的操作，否则会报错
+
     # 读入图片数据:
     key_batch, image_batch = read_picture()
 
@@ -281,22 +284,17 @@ def CNN(image=None, is_train=True, is_load=True):
         merged = tf.summary.merge_all()  # merged operation
 
     # 初始化保存器
-    try:
-        saver = tf.train.Saver()
-    except :
-        tf.reset_default_graph()
-        saver = tf.train.Saver()
-
-
+    saver = tf.train.Saver()
 
     # 使用GPU
     with tf.device("/GPU:0"):
+        result = None
         # 开启会话:
         with tf.Session() as sess:
             sess.run(init)  # 初始化变量
             # 线程协调员
             coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess=sess, coord=coord)  # 开启队列
+            threads = tf.train.start_queue_runners(sess=sess, coord=coord)  # 开启队列线程
 
             # 创建事件文件, 用于在TensorBoard中进行可视化
             file_event = tf.summary.FileWriter("./event/model", graph=sess.graph)
@@ -345,7 +343,7 @@ def CNN(image=None, is_train=True, is_load=True):
             else:  # 预测数据
                 print("use CNN model to predict:")
                 print("load model...")
-                if os.path.exists("checkpoint"):
+                if os.path.exists("./checkpoint"):
                     saver.restore(sess=sess, save_path="./checkpoint/model.ckpt")
                 else:
                     print("model path not exist")
@@ -355,14 +353,15 @@ def CNN(image=None, is_train=True, is_load=True):
                 # ''.join(str(result).strip('[]').split())
                 # ''.join([str(x) for x in result.tolist()])
 
-                return ''.join([str(x) for x in result.tolist()])  # 直接返回的是str类型
+                result = ''.join([str(x) for x in result.tolist()])  # 直接返回的是str类型
 
                 ################################################################################################
 
             coord.request_stop()
             # coord.should_stop()
             coord.join(threads=threads)
-    return None
+
+    return result
 
 
 def get_image():
@@ -384,28 +383,32 @@ def conversion_image_format(img):
 
 
 def image():
-    root = "../checkout_gray"
+    root = "../picture"
     img_list = os.listdir(root)
     random_gary_list = random.sample(img_list, 6)
     # 画图
-    fig = plt.figure(figsize=(8, 4))
-
+    fig = plt.figure(figsize=(6, 4))
+    plt.subplots_adjust(wspace=0.4, hspace=0.2)
     for i in range(2):
         for j in range(3):
-            img = cv.imread(root + '/' + random_gary_list[i + j])
-            # print(img)
+            img = cv.imread(root + '/' + random_gary_list[i + j], flags=cv.IMREAD_COLOR)
+            # cv.imshow("img", img)
+            # cv.waitKey(0)
+            # print(img.shape)
             img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-            img_gray = conversion_image_format(img_gray)
-            ocr_result = CNN(img_gray, is_train=False)
+            ocr_result = CNN(conversion_image_format(img_gray), is_train=False, is_load=False)
             print("ocr_result: ", ocr_result)
-            fig.add_subplot(6, i + 1, j + 1)
-            plt.imshow(img[:, :, ::-1])
+            fig.add_subplot(2, 3, i * 3 + j + 1)
+            plt.imshow(img[:, :, :: -1])
             # ocr result
-            plt.title("ocr: " + ocr_result)
+            plt.title("OCR: " + ocr_result)
         #     break
         # break
+    plt.savefig("./pic.png")
     plt.show()
+
+    return None
 
 
 if __name__ == '__main__':
