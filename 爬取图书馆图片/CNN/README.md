@@ -16,10 +16,10 @@
 
 模型评估：
 
-![8710d4e2f3d94e0677fb54eafb5866f](C:\Users\HP\AppData\Local\Temp\WeChat Files\8710d4e2f3d94e0677fb54eafb5866f.png)
+
 
 ---
 
-
+![pic](D:\PyCharm\deep_learning_TensorFlow\爬取图书馆图片\CNN\pic.png)
 
 正在完善中..
