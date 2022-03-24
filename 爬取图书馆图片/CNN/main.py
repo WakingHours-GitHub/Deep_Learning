@@ -226,6 +226,7 @@ def key2filename(key_batch_value):
 
 
 def CNN(image=None, is_train=True, is_load=True):
+    # 在每次启动CNN前, 都要重置图.
     tf.reset_default_graph()  # 需要在网络结构之前加上重置图的操作，否则会报错
 
     # 读入图片数据:
@@ -252,7 +253,8 @@ def CNN(image=None, is_train=True, is_load=True):
 
         # 构造优化器
         with tf.variable_scope("optimizer"):
-            optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
+            learn_rate = tf.placeholder(tf.float32)
+            optimizer = tf.train.AdamOptimizer(learning_rate=learn_rate).minimize(loss)
 
         # 计算准确率:
         # equal = tf.equal(
@@ -311,7 +313,7 @@ def CNN(image=None, is_train=True, is_load=True):
 
                 ############################################################################
 
-                for i in range(100000):  # 开始训练
+                for i in range(1000):  # 开始训练
                     key_value, image_value = sess.run([key_batch, image_batch])
                     key_value = key2filename(key_value)
                     # print(key_value)  # [[0 1 5 5]]
@@ -321,11 +323,13 @@ def CNN(image=None, is_train=True, is_load=True):
                     # print(labels_value) # [[0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 1. 0. 0.
                     # 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]]
 
+                    ression_learn_rate = 0.01
                     # 运行优化器:
                     _, loss_value, accuracy_value, summary = sess.run(
                         [optimizer, loss, accuracy, merged],
-                        feed_dict={x: image_value, y_true: labels_value}
+                        feed_dict={x: image_value, y_true: labels_value, learn_rate: ression_learn_rate}  # 自定义学习率
                     )
+                    ression_learn_rate -= 0.0001
                     print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f" % (loss_value, accuracy_value))
 
                     #
@@ -382,8 +386,8 @@ def conversion_image_format(img):
     return np.array(np.reshape(img, newshape=[1, height, width, channel]))  # 逆归一化
 
 
-def image():
-    root = "../picture"
+def image_test():
+    root = "../picture"  # 根目录
     img_list = os.listdir(root)
     random_gary_list = random.sample(img_list, 6)
     # 画图
@@ -405,7 +409,7 @@ def image():
             plt.title("OCR: " + ocr_result)
         #     break
         # break
-    plt.savefig("./pic.png")
+    plt.savefig("./pic.png") # 保存图片
     plt.show()
 
     return None
@@ -416,7 +420,7 @@ if __name__ == '__main__':
     # img = get_image()
     # ocr_result = CNN(get_image(), is_train=False)
     # print(''.join(ocr_result.strip('[]').split()))
-    image()
-
+    image_test()
+    #
     # 训练
     # CNN(is_train=True, is_load=True)
