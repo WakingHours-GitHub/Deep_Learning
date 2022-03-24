@@ -333,7 +333,7 @@ def CNN(image=None, is_train=True, is_load=True):
                         feed_dict={x: image_value, y_true: labels_value, learn_rate: session_learn_rate}  # 自定义学习率
                     )
                     print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f, learn_rate: %10.6f" % (loss_value, accuracy_value, session_learn_rate))
-                    session_learn_rate *= (iter_num-i)/iter_num
+                    session_learn_rate *= ((iter_num-i)/iter_num)*0.0001
 
                     #
                     # summary = sess.run(merged, feed_dict={x: image_value, y_true: labels_value})
@@ -398,7 +398,7 @@ def image_test():
     plt.subplots_adjust(wspace=0.4, hspace=0.2)
     for i in range(2):
         for j in range(3):
-            img = cv.imread(root + '/' + random_gary_list[i + j], flags=cv.IMREAD_COLOR)
+            img = cv.imread(root + '/' + random_gary_list[i * 3 + j], flags=cv.IMREAD_COLOR)
             # cv.imshow("img", img)
             # cv.waitKey(0)
             # print(img.shape)
