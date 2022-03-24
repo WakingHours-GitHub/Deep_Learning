@@ -3,7 +3,6 @@ import random
 
 import cv2 as cv
 import matplotlib.pyplot as plt
-import matplotlib.pylab as pll
 import numpy as np
 import tensorflow._api.v2.compat.v1 as tf
 
@@ -23,6 +22,10 @@ graph = tf.Graph()  # 属性
 
 # 训练时候的, batch_size (批处理队列长度)
 batch_size = 100
+
+# 迭代次数
+iter_num = 1000
+
 
 # image information:
 height = 50
@@ -312,8 +315,8 @@ def CNN(image=None, is_train=True, is_load=True):
                         print("model path not exist")
 
                 ############################################################################
-
-                for i in range(1000):  # 开始训练
+                session_learn_rate = 0.01
+                for i in range(iter_num):  # 开始训练
                     key_value, image_value = sess.run([key_batch, image_batch])
                     key_value = key2filename(key_value)
                     # print(key_value)  # [[0 1 5 5]]
@@ -323,14 +326,14 @@ def CNN(image=None, is_train=True, is_load=True):
                     # print(labels_value) # [[0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 1. 0. 0.
                     # 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]]
 
-                    ression_learn_rate = 0.01
+
                     # 运行优化器:
                     _, loss_value, accuracy_value, summary = sess.run(
                         [optimizer, loss, accuracy, merged],
-                        feed_dict={x: image_value, y_true: labels_value, learn_rate: ression_learn_rate}  # 自定义学习率
+                        feed_dict={x: image_value, y_true: labels_value, learn_rate: session_learn_rate}  # 自定义学习率
                     )
-                    ression_learn_rate -= 0.0001
-                    print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f" % (loss_value, accuracy_value))
+                    print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f, learn_rate: %10.6f" % (loss_value, accuracy_value, session_learn_rate))
+                    session_learn_rate *= (iter_num-i)/iter_num
 
                     #
                     # summary = sess.run(merged, feed_dict={x: image_value, y_true: labels_value})
