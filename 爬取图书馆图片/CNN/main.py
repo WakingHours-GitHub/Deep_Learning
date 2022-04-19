@@ -121,7 +121,7 @@ def convolutional_neural_network(x):
 
         with tf.variable_scope("full_connection"):
             x_fc = tf.reshape(x_pool, shape=[-1, 25 * 65 * 32])
-            weights_fc = tf.Variable(
+            weights_fc = tf.V
                 initial_value=tf.random_normal(shape=[25 * 65 * 32, 4 * 10], mean=0.0, stddev=1.0)
             )
             bias_fc = tf.Variable(
@@ -130,7 +130,7 @@ def convolutional_neural_network(x):
             y_pred = tf.add(tf.matmul(x_fc, weights_fc), bias_fc)
             # print(y_pred)  # Tensor("convolutional/full_connection/Add:0", shape=(1, 40), dtype=float32, device=/device:GPU:0)
 
-    return y_pred
+    return y_predariable(
 
 
 """
@@ -252,7 +252,7 @@ def CNN(image=None, is_train=True, is_load=True):
                 labels=y_true,
                 logits=y_pred
             )
-            loss = tf.reduce_mean(loss_list)
+            loss = tf.reduce_mean(loss_list) # 计算均值
 
         # 构造优化器
         with tf.variable_scope("optimizer"):
