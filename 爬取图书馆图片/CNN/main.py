@@ -40,7 +40,8 @@ def read_picture(batch_size=100):
     返回读取好的批处理
     """
     # 构建文件名序列:
-    path = "..\\checkout_gray"  # 识别代码需要保存的文件路径
+    # path = ".\\checkout_gray"  # 识别代码需要保存的文件路径
+    path = "./picture_gray"
     file_list = [os.path.join(path, filename) for filename in os.listdir(path)]
     # print(file_list)
     # 生成文件队列:
@@ -121,7 +122,7 @@ def convolutional_neural_network(x):
 
         with tf.variable_scope("full_connection"):
             x_fc = tf.reshape(x_pool, shape=[-1, 25 * 65 * 32])
-            weights_fc = tf.V
+            weights_fc = tf.Variable(
                 initial_value=tf.random_normal(shape=[25 * 65 * 32, 4 * 10], mean=0.0, stddev=1.0)
             )
             bias_fc = tf.Variable(
@@ -130,7 +131,8 @@ def convolutional_neural_network(x):
             y_pred = tf.add(tf.matmul(x_fc, weights_fc), bias_fc)
             # print(y_pred)  # Tensor("convolutional/full_connection/Add:0", shape=(1, 40), dtype=float32, device=/device:GPU:0)
 
-    return y_predariable(
+    return y_pred
+
 
 
 """
@@ -320,16 +322,20 @@ def CNN(image=None, is_train=True, is_load=True):
                     key_value, image_value = sess.run([key_batch, image_batch])
                     key_value = key2filename(key_value)
                     # print(key_value)  # [[0 1 5 5]]
+                    print(image_value, image_value.shape)
+                    print(key_value, key_value.shape)
 
-                    # 进行one_hot编码:
-                    labels_value = tf.reshape(tf.one_hot(key_value, depth=10), shape=[-1, 4 * 10]).eval()
+                    # 将读取出来得key_value进行one_hot编码: 返回label
+                    labels_value = tf.reshape(tf.one_hot(key_value, depth=10), shape=[-1, 4 * 10]).eval() # 直接运行
                     # print(labels_value) # [[0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 1. 0. 0.
                     # 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]]
-
+                    print(labels_value, labels_value.shape) # (-1, 40)
 
                     # 运行优化器:
                     _, loss_value, accuracy_value, summary = sess.run(
-                        [optimizer, loss, accuracy, merged],
+                        [
+                            optimizer, loss, accuracy, merged
+                        ],
                         feed_dict={x: image_value, y_true: labels_value, learn_rate: session_learn_rate}  # 自定义学习率
                     )
                     print(f"{i + 1} train, loss:%10.6f, accuracy:%10.6f, learn_rate: %10.6f" % (loss_value, accuracy_value, session_learn_rate))
@@ -423,7 +429,7 @@ if __name__ == '__main__':
     # img = get_image()
     # ocr_result = CNN(get_image(), is_train=False)
     # print(''.join(ocr_result.strip('[]').split()))
-    image_test()
+    # image_test()
     #
     # 训练
-    # CNN(is_train=True, is_load=True)
+    CNN(is_train=True, is_load=True)
