@@ -19,4 +19,8 @@
 
 [Deep_Learning/pic.png at master · WakingHours-GitHub/Deep_Learning](https://github.com/WakingHours-GitHub/Deep_Learning/blob/master/LibraryPictureCode/CNN/pic.png)
 
+![pic](D:\PyCharm\deep_learning_TensorFlow\LibraryPictureCode\CNN\pic.png)
+
+Improving...
+
 正在完善中..
