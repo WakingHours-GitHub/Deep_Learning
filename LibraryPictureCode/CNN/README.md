@@ -21,7 +21,7 @@
 
 
 
-![pic][pic.png (600×400) (raw.githubusercontent.com)](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/CNN/pic.png)
+![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/CNN/pic.png)
 
 
 
