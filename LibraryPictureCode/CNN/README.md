@@ -11,9 +11,9 @@
 
 ## Network Structure
 
+![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/result/NetWork Structure.png)
 
-
-
+![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/result/Snipaste_2022-03-24_13-24-44.png)
 
 ## Model Evaluation
 
@@ -23,7 +23,7 @@
 
 ![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/CNN/pic.png)
 
-
+![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/result/pic.png)
 
 Improving...
 
