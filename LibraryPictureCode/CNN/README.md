@@ -11,7 +11,9 @@
 
 ## Network Structure
 
-![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/result/NetWork_Structure.png)
+
+
+
 
 ![img](https://raw.githubusercontent.com/WakingHours-GitHub/Deep_Learning/master/LibraryPictureCode/result/Snipaste_2022-03-24_13-24-44.png)
 
